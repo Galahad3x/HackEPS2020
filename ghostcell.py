@@ -6,7 +6,25 @@ import math
 
 def prnt(toprint):
     print(toprint, file=sys.stderr, flush=True)
-
+        
+class Factory:
+    def __init__(self, entityId, entityType, arg1, arg2, arg3):
+        self.entityId = entityId
+        self.entityType = entityType
+        self.owner = arg1
+        self.num_cyborgs = arg2
+        self.production = arg3
+        
+class Troop:
+    def __init__(self, entityId, entityType, arg1, arg2, arg3, arg4, arg5):
+        self.entityId = entityId
+        self.entityType = entityType
+        self.owner = arg1
+        self.leaving = arg2
+        self.target = arg3
+        self.n_cyborgs = arg4
+        self.remaining_turns = arg5
+        
 factory_count = int(input())  # the number of factories
 link_count = int(input())  # the number of links between factories
 distances = {}
@@ -15,7 +33,6 @@ for i in range(link_count):
     distances.setdefault(factory_1,{factory_2: distance})
     distances[factory_1][factory_2] = distance
 prnt(distances)
-prnt("hola")
 
 # game loop
 while True:
