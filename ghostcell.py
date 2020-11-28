@@ -29,12 +29,12 @@ class Bot:
     def __init__(self, factoryCount, distances):
         self.factoryCount = factory_count
         self.distances = distances
-        self.myFactories = []
-        self.myTroops = []
-        self.neutralFactories = []
+        self.myFactories = {}
+        self.myTroops = {}
+        self.neutralFactories = {}
         # Informacion sobre el enemigo
-        self.enemyFactories = []
-        self.enemmyTroops = []
+        self.enemyFactories = {}
+        self.enemmyTroops = {}
 
     # Arranque del bot
     def run(self):
