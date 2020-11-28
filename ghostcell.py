@@ -8,7 +8,7 @@ def prnt(toprint):
     print(toprint, file=sys.stderr, flush=True)
         
 class Factory:
-    def __init__(self, entityId, entityType, arg1, arg2, arg3):
+    def __init__(self, entityId, entityType, owner, num_cyborgs, production):
         self.entityId = entityId
         self.entityType = entityType
         self.owner = arg1
@@ -16,7 +16,7 @@ class Factory:
         self.production = arg3
         
 class Troop:
-    def __init__(self, entityId, entityType, arg1, arg2, arg3, arg4, arg5):
+    def __init__(self, entityId, entityType, owner, leaving, target, n_cyborgs, remaining_turns):
         self.entityId = entityId
         self.entityType = entityType
         self.owner = arg1
@@ -46,9 +46,6 @@ while True:
         arg_3 = int(inputs[4])
         arg_4 = int(inputs[5])
         arg_5 = int(inputs[6])
-
-    # Write an action using print
-    # To debug: print("Debug messages...", file=sys.stderr, flush=True)
 
 
     # Any valid action, such as "WAIT" or "MOVE source destination cyborgs"
