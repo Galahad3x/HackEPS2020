@@ -162,11 +162,12 @@ class Bot:
         return attacker
 
     def any_attacker(self, factory):
+        attacker = []
         for fact in self.myfactories:
             if fact.numCyborgs > factory.numCyborgs:
-                return fact
-                    
-                    
+               attacker.append(fact)
+        return attacker
+                   
     def action(self):
         val = None
         factory = None
@@ -178,14 +179,13 @@ class Bot:
         if factory is None:
             print("WAIT")
             return 0
+        
         att = self.nearest_attacker(factory)
         if att is None:
             print("WAIT")
             return 0
-        movement = "MOVE " + str(att.entityId) + " " + str(factory.entityId) + " " + str(factory.numCyborgs + 1)
-        # if self.movement_puntuation(movement) >= self.movement_puntuation("WAIT"):
+        movement = "MOVE " + str(att.entityId) + " " + str(factory.entityId) + " " + str(factory.numCyborgs + 1)    
         print(movement)
-            
                       
 
 # Carga de la infomacion inicial
