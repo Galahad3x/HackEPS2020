@@ -64,6 +64,9 @@ class Bot:
         self.t = 20
         self.assumed_losing_prob = 0.05
         self.max_dist = max_dist
+        self.myfactories = None
+        self.enemyfactories = None
+        self.neutralfactories = None
        
     # Arranque del bot
     def run(self):
@@ -81,7 +84,10 @@ class Bot:
                 if entity_type == "FACTORY":
                     self.factories[entity_id]= Factory(entity_id,entity_type,arg_1,arg_2,arg_3)
                 if entity_type == "TROOP":
-                    self.troops[entity_id] = Troop(entity_id, entity_type, arg_1, arg_2, arg_3,arg_4,arg_5)        
+                    self.troops[entity_id] = Troop(entity_id, entity_type, arg_1, arg_2, arg_3,arg_4,arg_5)
+            self.myfactories = self.get_myfactories()
+            self.enemyfactories = self.get_enemyfactories()
+            self.neutralfactories = self.get_neutralfactories()
             self.action()
 
     def get_myfactories(self):
@@ -98,8 +104,8 @@ class Bot:
 
     def factory_puntuation(self, factory, ally=True):
         if ally:
-            ally_dist = factory.nearest_distance(self.distances, self.get_myfactories())
-            enemy_dist = factory.nearest_distance(self.distances, self.get_enemyfactories())
+            ally_dist = factory.nearest_distance(self.distances, self.myfactories)
+            enemy_dist = factory.nearest_distance(self.distances, self.enemyfactories)
             prod = factory.production
             if factory.numCyborgs != 0:
                 cybs = self.pond[3] / factory.numCyborgs
@@ -107,8 +113,8 @@ class Bot:
                 cybs = 0
             owner = -factory.owner
         else:
-            ally_dist = factory.nearest_distance(self.distances, self.get_enemyfactories())
-            enemy_dist = factory.nearest_distance(self.distances, self.get_myfactories())
+            ally_dist = factory.nearest_distance(self.distances, self.enemyfactories)
+            enemy_dist = factory.nearest_distance(self.distances, self.myfactories)
             prod = factory.production
             if factory.numCyborgs != 0:
                 cybs = self.pond[3] / factory.numCyborgs
@@ -123,9 +129,9 @@ class Bot:
     def movement_puntuation(self, movement):
         movs = movement.split(" ")
         if movs[0] == "MOVE":
-            suma_numCyborgs = sum([fact.numCyborgs for fact in self.get_myfactories()])
+            suma_numCyborgs = sum([fact.numCyborgs for fact in self.myfactories])
             numCyborgs = suma_numCyborgs - self.factories[int(movs[2])].numCyborgs
-            for fact in self.get_myfactories():
+            for fact in self.myfactories:
                 if fact.entityId != int(movs[2]):
                     numCyborgs += max(fact.calculate_n(self), self.t) * fact.production
                 else:
@@ -135,8 +141,8 @@ class Bot:
                         dist = distances[int(movs[1])][int(movs[2])]
                     numCyborgs += (max(fact.calculate_n(self), self.t) - dist) * fact.production
         elif movs[0] == "WAIT":
-            numCyborgs = sum([fact.numCyborgs for fact in self.get_myfactories()])
-            for fact in self.get_myfactories():
+            numCyborgs = sum([fact.numCyborgs for fact in self.myfactories])
+            for fact in self.myfactories:
                 numCyborgs += max(fact.calculate_n(self), self.t) * fact.production
         return numCyborgs
     
@@ -144,7 +150,7 @@ class Bot:
     def nearest_attacker(self, factory):
         distance = None
         attacker = None
-        for fact in self.get_myfactories():
+        for fact in self.myfactories:
             try:
                 dist = distances[factory.entityId][fact.entityId]
             except KeyError:
@@ -159,7 +165,7 @@ class Bot:
     def action(self):
         val = None
         factory = None
-        for fact in self.get_neutralfactories() + self.get_enemyfactories():
+        for fact in self.neutralfactories + self.enemyfactories:
             calculated_val = self.factory_puntuation(fact)
             if val is None or val < calculated_val:
                 val = calculated_val
