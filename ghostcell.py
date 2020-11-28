@@ -8,23 +8,56 @@ def prnt(toprint):
     print(toprint, file=sys.stderr, flush=True)
         
 class Factory:
-    def __init__(self, entityId, entityType, owner, num_cyborgs, production):
+    def __init__(self, entityId, entityType, owner, numCyborgs, production):
         self.entityId = entityId
         self.entityType = entityType
-        self.owner = arg1
-        self.num_cyborgs = arg2
-        self.production = arg3
+        self.owner = owner
+        self.numCyborgs = numCyborgs
+        self.production = production
         
 class Troop:
-    def __init__(self, entityId, entityType, owner, leaving, target, n_cyborgs, remaining_turns):
+    def __init__(self, entityId, entityType, owner, leaving, target, nCyborgs, remainingTurns):
         self.entityId = entityId
         self.entityType = entityType
-        self.owner = arg1
-        self.leaving = arg2
-        self.target = arg3
-        self.n_cyborgs = arg4
-        self.remaining_turns = arg5
-        
+        self.owner = owner
+        self.leaving = leaving
+        self.target = target
+        self.nCyborgs = nCyborgs
+        self.remainingTurns = remainingTurns
+
+class Bot:
+    def __init__(factoryCount, distances):
+        self.factoryCount = factory_count
+        self.distances = distances
+        self.myFactories = []
+        self.myTroops = []
+        self.neutralFactories = []
+        # Informacion sobre el enemigo
+        self.enemyFactories = []
+        self.enemmyTroops = []
+
+    # Arranque del bot
+    def start(self):
+        while True:
+            entity_count = int(input())  # the number of entities (e.g. factories and troops)
+            for i in range(entity_count):
+                inputs = input().split()
+                entity_id = int(inputs[0])
+                entity_type = inputs[1]
+                arg_1 = int(inputs[2])
+                arg_2 = int(inputs[3])
+                arg_3 = int(inputs[4])
+                arg_4 = int(inputs[5])
+                arg_5 = int(inputs[6])
+            #action()
+
+    def factory_puntuation(self, factory, Troops):
+        return 0
+
+    def action(self, factory_puntuation):
+        pass
+
+# Carga de la infomacion inicial
 factory_count = int(input())  # the number of factories
 link_count = int(input())  # the number of links between factories
 distances = {}
@@ -33,20 +66,3 @@ for i in range(link_count):
     distances.setdefault(factory_1,{factory_2: distance})
     distances[factory_1][factory_2] = distance
 prnt(distances)
-
-# game loop
-while True:
-    entity_count = int(input())  # the number of entities (e.g. factories and troops)
-    for i in range(entity_count):
-        inputs = input().split()
-        entity_id = int(inputs[0])
-        entity_type = inputs[1]
-        arg_1 = int(inputs[2])
-        arg_2 = int(inputs[3])
-        arg_3 = int(inputs[4])
-        arg_4 = int(inputs[5])
-        arg_5 = int(inputs[6])
-
-
-    # Any valid action, such as "WAIT" or "MOVE source destination cyborgs"
-    print("WAIT")
