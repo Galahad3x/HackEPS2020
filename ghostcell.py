@@ -45,7 +45,6 @@ class Bot:
                 arg_3 = int(inputs[4])
                 arg_4 = int(inputs[5])
                 arg_5 = int(inputs[6])
-                
                 if entity_type == "FACTORY":
                     self.factories[entity_id]= Factory(entity_id,entity_type,arg_1,arg_2,arg_3)
                 if entity_type == "TROOP":
