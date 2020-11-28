@@ -1,13 +1,16 @@
 import sys
 import math
-#e = 2.718281
+
+
+# e = 2.718281
 
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
 
 def prnt(toprint):
     print(toprint, file=sys.stderr, flush=True)
-        
+
+
 class Factory:
     def __init__(self, entityId, entityType, owner, numCyborgs, production):
         self.entityId = entityId
@@ -15,35 +18,35 @@ class Factory:
         self.owner = owner
         self.numCyborgs = numCyborgs
         self.production = production
-        
+
     def nearest_distance(self, distances, factories):
-        distance = None
+        nearer_distance = None
         for fact in factories:
             if fact.entityId == self.entityId:
                 continue
             try:
-                dist = distances[self.entityId][fact.entityId]
+                dist_btw_factories = distances[self.entityId][fact.entityId]
             except KeyError:
-                dist = distances[fact.entityId][self.entityId]
-            if distance is None or dist < distance:
-                distance = dist
-        return distance
-        
+                dist_btw_factories = distances[fact.entityId][self.entityId]
+            if nearer_distance is None or dist_btw_factories < nearer_distance:
+                nearer_distance = dist_btw_factories
+        return nearer_distance
+
     def danger_factor(self, bot):
-        enemy_value = bot.factory_puntuation(self,ally=False)
+        enemy_value = bot.factory_puntuation(self, ally=False)
         in_min = out_min = 0
         in_max = bot.max_enemy_puntuation(self)
         out_max = 100
         x = enemy_value
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-        
+
     def calculate_n(self, bot):
         superior = math.log(math.e, bot.assumed_losing_prob)
-        prnt(inferior)
         inferior = math.log(math.e, 100 - self.danger_factor(bot))
         prnt(inferior)
         return int(round((superior / inferior) / 100))
-        
+
+
 class Troop:
     def __init__(self, entityId, entityType, owner, leaving, target, numCyborgs, remainingTurns):
         self.entityId = entityId
@@ -54,20 +57,21 @@ class Troop:
         self.numCyborgs = numCyborgs
         self.remainingTurns = remainingTurns
 
+
 class Bot:
     def __init__(self, factoryCount, distances, max_dist):
         self.factoryCount = factory_count
         self.distances = distances
         self.factories = {}
         self.troops = {}
-        self.pond = [1,1,1,1,1]
+        self.pond = [1, 1, 1, 1, 1]
         self.t = 20
         self.assumed_losing_prob = 0.05
         self.max_dist = max_dist
         self.myfactories = None
         self.enemyfactories = None
         self.neutralfactories = None
-       
+
     # Arranque del bot
     def run(self):
         while True:
@@ -82,9 +86,9 @@ class Bot:
                 arg_4 = int(inputs[5])
                 arg_5 = int(inputs[6])
                 if entity_type == "FACTORY":
-                    self.factories[entity_id]= Factory(entity_id,entity_type,arg_1,arg_2,arg_3)
+                    self.factories[entity_id] = Factory(entity_id, entity_type, arg_1, arg_2, arg_3)
                 if entity_type == "TROOP":
-                    self.troops[entity_id] = Troop(entity_id, entity_type, arg_1, arg_2, arg_3,arg_4,arg_5)
+                    self.troops[entity_id] = Troop(entity_id, entity_type, arg_1, arg_2, arg_3, arg_4, arg_5)
             self.myfactories = self.get_myfactories()
             self.enemyfactories = self.get_enemyfactories()
             self.neutralfactories = self.get_neutralfactories()
@@ -121,10 +125,10 @@ class Bot:
             else:
                 cybs = 0
             owner = factory.owner
-            
+
         if ally_dist is None or enemy_dist is None:
             return 0
-        return  self.pond[0] / ally_dist + self.pond[1] * enemy_dist + self.pond[2] * prod + cybs + self.pond[4] * owner
+        return self.pond[0] / ally_dist + self.pond[1] * enemy_dist + self.pond[2] * prod + cybs + self.pond[4] * owner
 
     def movement_puntuation(self, movement):
         movs = movement.split(" ")
@@ -145,48 +149,47 @@ class Bot:
             for fact in self.myfactories:
                 numCyborgs += max(fact.calculate_n(self), self.t) * fact.production
         return numCyborgs
-    
-    
+
     def nearest_attacker(self, factory):
-        distance = None
+        distance_attckr = None
         attacker = None
         for fact in self.myfactories:
             try:
                 dist = distances[factory.entityId][fact.entityId]
             except KeyError:
                 dist = distances[fact.entityId][factory.entityId]
-            if distance is None or dist < distance:
+            if distance_attckr is None or dist < distance_attckr:
                 if fact.numCyborgs > factory.numCyborgs:
                     attacker = fact
-                    distance = dist
+                    distance_attckr = dist
         return attacker
 
     def any_attacker(self, factory):
         attacker = []
         for fact in self.myfactories:
             if fact.numCyborgs > factory.numCyborgs:
-               attacker.append(fact)
+                attacker.append(fact)
         return attacker
-                   
+
     def action(self):
-        val = None
+        points = None
         factory = None
         for fact in self.neutralfactories + self.enemyfactories:
-            calculated_val = self.factory_puntuation(fact)
-            if val is None or val < calculated_val:
-                val = calculated_val
+            fact_point = self.factory_puntuation(fact)
+            if points is None or points < fact_point:
+                points = fact_point
                 factory = fact
         if factory is None:
             print("WAIT")
             return 0
-        
-        att = self.nearest_attacker(factory)
-        if att is None:
+
+        attacker = self.nearest_attacker(factory)
+        if attacker is None:
             print("WAIT")
             return 0
-        movement = "MOVE " + str(att.entityId) + " " + str(factory.entityId) + " " + str(factory.numCyborgs + 1)    
+        movement = "MOVE " + str(attacker.entityId) + " " + str(factory.entityId) + " " + str(factory.numCyborgs + 1)
         print(movement)
-                      
+
 
 # Carga de la infomacion inicial
 factory_count = int(input())  # the number of factories
@@ -195,8 +198,9 @@ distances = {}
 maxd = 0
 for i in range(link_count):
     factory_1, factory_2, distance = [int(j) for j in input().split()]
-    distances.setdefault(factory_1,{factory_2: distance})
+    distances.setdefault(factory_1, {factory_2: distance})
     distances[factory_1][factory_2] = distance
     if distance > maxd:
         maxd = distance
 Bot(factory_count, distances, maxd).run()
+
