@@ -49,22 +49,35 @@ class Bot:
                 if entity_type == "FACTORY":
                     self.factories[entity_id]= Factory(entity_id,entity_type,arg_1,arg_2,arg_3)
                 if entity_type == "TROOP":
-                    self.factories[entity_id] = Troop(entity_id, entity_type, arg_1, arg_2, arg_3,arg_4,arg_5)
-                
-            prnt(self.get_myfactories())
-            print("MOVE 1 3 6")
+                    self.troops[entity_id] = Troop(entity_id, entity_type, arg_1, arg_2, arg_3,arg_4,arg_5)        
+            self.action(None)
 
     def get_myfactories(self):
-        return [factorie.entityId for factorie in self.factories.values() if factorie.owner == 1]
+        return [factorie for factorie in self.factories.values() if factorie.owner == 1]
 
     def get_enemyfactories(self):
-        return [factorie.entityId for factorie in self.factories.values() if factorie.owner == -1]
+        return [factorie for factorie in self.factories.values() if factorie.owner == -1]
+
+    def get_neutralfactories(self):
+        return [factorie for factorie in self.factories.values() if factorie.owner == 0]
 
     def factory_puntuation(self, factory):
         return 0
 
     def action(self, factory_puntuation):
-        pass
+        first = self.get_myfactories()[-1].entityId
+        if len(self.get_neutralfactories()) !=0 :
+            distance = -1
+            nearest = None
+            for factory in self.get_neutralfactories():
+                if nearest == None or distance > self.distances[first][factory.entityId]:
+                    distance = self.distances[first][factory.entityId]
+                    nearest = factory
+            print('MOVE {0} {1} 1'.format(first, nearest))
+                
+            
+
+            
 
 # Carga de la infomacion inicial
 factory_count = int(input())  # the number of factories
