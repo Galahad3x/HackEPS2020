@@ -65,19 +65,8 @@ class Bot:
         return 0
 
     def action(self, factory_puntuation):
-        first = self.get_myfactories()[-1].entityId
-        if len(self.get_neutralfactories()) !=0 :
-            distance = -1
-            nearest = None
-            for factory in self.get_neutralfactories():
-                if nearest == None or distance > self.distances[first][factory.entityId]:
-                    distance = self.distances[first][factory.entityId]
-                    nearest = factory
-            print('MOVE {0} {1} 1'.format(first, nearest))
-                
-            
-
-            
+        print('WAIT')
+                      
 
 # Carga de la infomacion inicial
 factory_count = int(input())  # the number of factories
@@ -88,3 +77,4 @@ for i in range(link_count):
     distances.setdefault(factory_1,{factory_2: distance})
     distances[factory_1][factory_2] = distance
 Bot(factory_count, distances).run()
+
