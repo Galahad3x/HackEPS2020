@@ -160,6 +160,11 @@ class Bot:
                     attacker = fact
                     distance = dist
         return attacker
+
+    def any_attacker(self, factory):
+        for fact in self.myfactories:
+            if fact.numCyborgs > factory.numCyborgs:
+                return fact
                     
                     
     def action(self):
@@ -170,9 +175,14 @@ class Bot:
             if val is None or val < calculated_val:
                 val = calculated_val
                 factory = fact
-        if self.nearest_attacker(factory) is None:
-            return "WAIT"
-        movement = "MOVE " + str(self.nearest_attacker(factory).entityId) + " " + str(factory.entityId) + " " + str(factory.numCyborgs + 1)
+        if factory is None:
+            print("WAIT")
+            return 0
+        att = self.nearest_attacker(factory)
+        if att is None:
+            print("WAIT")
+            return 0
+        movement = "MOVE " + str(att.entityId) + " " + str(factory.entityId) + " " + str(factory.numCyborgs + 1)
         # if self.movement_puntuation(movement) >= self.movement_puntuation("WAIT"):
         print(movement)
             
@@ -190,4 +200,3 @@ for i in range(link_count):
     if distance > maxd:
         maxd = distance
 Bot(factory_count, distances, maxd).run()
-
