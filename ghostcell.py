@@ -133,8 +133,32 @@ class Bot:
             return 0
         return self.pond[0] / ally_dist + self.pond[1] * enemy_dist + self.pond[2] * prod + cybs + self.pond[4] * owner
 
+
     def nearest_attacker(self, factory):
         distance_attcker = None
+
+    def movement_puntuation(self, movement):
+        movs = movement.split(" ")
+        if movs[0] == "MOVE":
+            suma_numCyborgs = sum([fact.numCyborgs for fact in self.myfactories])
+            numCyborgs = suma_numCyborgs - self.factories[int(movs[2])].numCyborgs
+            for fact in self.myfactories:
+                if fact.entityId != int(movs[2]):
+                    numCyborgs += max(fact.calculate_n(self), self.t) * fact.production
+                else:
+                    try:
+                        dist = distances[int(movs[2])][int(movs[1])]
+                    except KeyError:
+                        dist = distances[int(movs[1])][int(movs[2])]
+                    numCyborgs += (max(fact.calculate_n(self), self.t) - dist) * fact.production
+        elif movs[0] == "WAIT":
+            numCyborgs = sum([fact.numCyborgs for fact in self.myfactories])
+            for fact in self.myfactories:
+                numCyborgs += max(fact.calculate_n(self), self.t) * fact.production
+        return numCyborgs
+
+    def nearest_attacker(self, factory):
+        distance_attckr = None
         attacker = None
         for fact in self.myfactories:
             try:
