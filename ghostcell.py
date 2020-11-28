@@ -26,7 +26,7 @@ class Troop:
         self.remainingTurns = remainingTurns
 
 class Bot:
-    def __init__(factoryCount, distances):
+    def __init__(self, factoryCount, distances):
         self.factoryCount = factory_count
         self.distances = distances
         self.myFactories = []
@@ -37,7 +37,7 @@ class Bot:
         self.enemmyTroops = []
 
     # Arranque del bot
-    def start(self):
+    def run(self):
         while True:
             entity_count = int(input())  # the number of entities (e.g. factories and troops)
             for i in range(entity_count):
