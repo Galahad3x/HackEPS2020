@@ -29,13 +29,9 @@ class Bot:
     def __init__(self, factoryCount, distances):
         self.factoryCount = factory_count
         self.distances = distances
-        self.myFactories = {}
-        self.myTroops = {}
-        self.neutralFactories = {}
-        # Informacion sobre el enemigo
-        self.enemyFactories = {}
-        self.enemmyTroops = {}
-
+        self.factories = {}
+        self.troops = {}
+       
     # Arranque del bot
     def run(self):
         while True:
@@ -51,7 +47,7 @@ class Bot:
                 arg_5 = int(inputs[6])
             #action()
 
-    def factory_puntuation(self, factory, Troops):
+    def factory_puntuation(self, factory):
         return 0
 
     def action(self, factory_puntuation):
