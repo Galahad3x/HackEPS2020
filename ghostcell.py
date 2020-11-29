@@ -24,6 +24,7 @@ class Factory:
                 nearer_distance = dist_btw_factories
         return nearer_distance
 
+    # Factor de peligro: Probabilidad de que el enemigo robe esta factory
     def danger_factor(self, bot):
         enemy_value = bot.factory_puntuation(self, ally=False)
         in_min = out_min = 0
@@ -32,6 +33,7 @@ class Factory:
         x = enemy_value
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
+    # Calcula n: Calcular los dias aproximador que tardara el enemigo a robar-nos una factory
     def calculate_n(self, bot):
         superior = math.log(math.e, bot.assumed_losing_prob)
         inferior = math.log(math.e, 100 - self.danger_factor(bot))
@@ -153,6 +155,7 @@ class Bot:
                         distance_attacker = dist
         return attacker
 
+    # Cualquier de nuestras factories
     def any_attacker(self, factory):
         attacker = []
         for fact in self.myfactories:
@@ -253,6 +256,7 @@ class Bot:
         print(";".join(movements) if movements != [] else "WAIT")
         return 0
 
+    # Puntuar un movimiento segun los ciborgs aproximados que tendremos dentro de t turnos
     def movement_puntuation(self, movement):
         movs = movement.split(" ")
         if movs[0] == "MOVE":
