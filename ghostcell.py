@@ -158,17 +158,17 @@ class Bot:
         return numCyborgs
 
     def nearest_attacker(self, factory):
-        distance_attckr = None
+        distance_attacker = None
         attacker = None
         for fact in self.myfactories:
             try:
                 dist = distances[factory.entityId][fact.entityId]
             except KeyError:
                 dist = distances[fact.entityId][factory.entityId]
-            if distance_attcker is None or dist < distance_attcker:
+            if distance_attacker is None or dist < distance_attacker:
                 if fact.numCyborgs > factory.numCyborgs:
                     attacker = fact
-                    distance_attcker = dist
+                    distance_attacker = dist
         return attacker
 
     def any_attacker(self, factory):
@@ -288,4 +288,3 @@ for i in range(link_count):
     if distance > maxd:
         maxd = distance
 Bot(factory_count, distances, maxd).run()
-
