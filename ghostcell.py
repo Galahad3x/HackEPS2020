@@ -1,16 +1,7 @@
 import sys
 import math
 
-
-# e = 2.718281
-
-# Auto-generated code below aims at helping you parse
-# the standard input according to the problem statement.
-
-def prnt(toprint):
-    print(toprint, file=sys.stderr, flush=True)
-
-
+# Clase Factory encargada de representar las factorias del juego
 class Factory:
     def __init__(self, entityId, entityType, owner, numCyborgs, production):
         self.entityId = entityId
@@ -46,8 +37,11 @@ class Factory:
         inferior = math.log(math.e, 100 - self.danger_factor(bot))
         prnt(inferior)
         return int(round((superior / inferior) / 100))
-
-
+'''
+    
+    Clase Troop encargada de representar las tropas del juego
+    
+'''
 class Troop:
     def __init__(self, entityId, entityType, owner, leaving, target, numCyborgs, remainingTurns):
         self.entityId = entityId
@@ -57,11 +51,14 @@ class Troop:
         self.target = target
         self.numCyborgs = numCyborgs
         self.remainingTurns = remainingTurns
+''' 
 
-
+    Clase encargada de decidir las las accciones a realizar en el juego
+    
+'''
 class Bot:
     def __init__(self, factoryCount, distances, max_dist):
-        self.factoryCount = factory_count
+        self.factoryCount = factoryCount
         self.distances = distances
         self.factories = {}
         self.troops = {}
@@ -72,9 +69,8 @@ class Bot:
         self.myfactories = None
         self.enemyfactories = None
         self.neutralfactories = None
-        self.botEtape = 0
-        self.turn = 0
         self.bombs = 2
+
     # Arranque del bot
     def run(self):
         while True:
@@ -96,7 +92,6 @@ class Bot:
             self.enemyfactories = self.get_enemyfactories()
             self.neutralfactories = self.get_neutralfactories()
             self.action()
-            self.turn += 1
 
     def get_myfactories(self):
         return [factorie for factorie in self.factories.values() if factorie.owner == 1]
@@ -110,7 +105,9 @@ class Bot:
     def max_enemy_puntuation(self, factory):
         return self.pond[0] + self.pond[1] * self.max_dist + self.pond[2] * 3 + self.pond[4]
 
+    # Calcula la puntuacion la factoria en funcion de la ponderación
     def factory_puntuation(self, factory, ally=True):
+        # De cara el bot
         if ally:
             ally_dist = factory.nearest_distance(self.distances, self.myfactories)
             enemy_dist = factory.nearest_distance(self.distances, self.enemyfactories)
@@ -121,6 +118,7 @@ class Bot:
                 cybs = 0
             owner = -factory.owner
         else:
+            # Puntuacion de la factoria desde el punto de vista del enemigo
             ally_dist = factory.nearest_distance(self.distances, self.enemyfactories)
             enemy_dist = factory.nearest_distance(self.distances, self.myfactories)
             prod = factory.production
@@ -129,19 +127,20 @@ class Bot:
             else:
                 cybs = 0
             owner = factory.owner
-
+        #
         if ally_dist is None or enemy_dist is None:
             return 0
         return self.pond[0] / ally_dist + self.pond[1] * enemy_dist + self.pond[2] * prod + cybs + self.pond[4] * owner
 
+    # Determina la factoria mas cercana valida
     def nearest_attacker(self, factory):
         distance_attacker = None
         attacker = None
         for fact in self.myfactories:
             try:
-                dist = distances[factory.entityId][fact.entityId]
+                dist = self.distances[factory.entityId][fact.entityId]
             except KeyError:
-                dist = distances[fact.entityId][factory.entityId]
+                dist = self.distances[fact.entityId][factory.entityId]
             if distance_attacker is None or dist < distance_attacker:
                 if factory.owner == 0:
                     if fact.numCyborgs > factory.numCyborgs:
@@ -160,46 +159,8 @@ class Bot:
             if fact.numCyborgs > factory.numCyborgs:
                 attacker.append(fact)
         return attacker
-    '''
-    def action(self):
-        points = None
-        factory = None
-        if self.turn == 0:
-            myFirstFactory = self.myfactories[0]
-            firstEnemyFactory = self.enemyfactories[0]
-            moviment = "BOMB " + str(myFirstFactory.entityId) + " " + str(firstEnemyFactory.entityId)
-            print(moviment)
-            return 0
-        elif self.turn == 1:
-            firstEnemyTroop = None
-            for troope in self.troops.values():
-                if troope.owner == -1:
-                    firstEnemyTroop = troope
-                    break
-            myFirstFactory = self.myfactories[0]
-            moviment = "BOMB " + str(myFirstFactory.entityId) + " " + str(firstEnemyTroop.target)
-            print(moviment)
-            return moviment
-        for fact in self.neutralfactories + self.enemyfactories:
-            fact_point = self.factory_puntuation(fact)
-            if points is None or points < fact_point:
-                points = fact_point
-                factory = fact
-        if factory is None:
-            for p in self.myfactories:
-                if p.production < 3:
-                    movement += ";INC " + str(p.entityId)
-            #print("WAIT")
-        attacker = self.nearest_attacker(factory)
-        if attacker is None:
-            print("WAIT")
-            return 0
-        movement = "MOVE " + str(attacker.entityId) + " " + str(factory.entityId) + " " + str(factory.numCyborgs + 1)
 
-        #if attacker.production < 3:
-            #movement += ";INC " + str(attacker.entityId)
-        print(movement)
-    '''
+    # Implementación de la utilizacion de las bombas
     def bomb_strategy(self):
         enemyTargetBomb = []
         if self.bombs <= 0:
@@ -207,8 +168,10 @@ class Bot:
         for enemyFactory in self.enemyfactories:
             if enemyFactory.numCyborgs > 10:
                 enemyTargetBomb.append(enemyFactory)
+                self.bombs -= 1
         return enemyTargetBomb
 
+    # Estrategia del incrementos de produccion de las factorias
     def inc_strategy(self):
         incTarget = []
         for myFactory in self.myfactories:
@@ -216,6 +179,7 @@ class Bot:
                 incTarget += ["INC " + str(myFactory.entityId)]
         return incTarget
 
+    # Estratagia
     def neutral_strategy(self):
         movements = []
         myFactories = self.myfactories
@@ -232,6 +196,7 @@ class Bot:
                 myFactories[0].numCyborgs -= 1
         return movements
 
+    # Estrategia de ayuda a las factorias que van a ser atacadas
     def help_factories_strategy(self):
         movements = []
         for currentFactory in self.myfactories:
@@ -247,25 +212,24 @@ class Bot:
                     currentFactory.numCyborgs -= nCyborgs
         return movements
 
+    # metodo encargado de realizar las acciones indicadas por las diferentes estrategias
     def action(self):
         points = None
         factory = None
         movements = []
-        if len(self.neutralfactories) == 0:
-            self.botEtape = 1
-        # Etapa 0 busqueda de las factorias sin dueño
-        self.botEtape = 1
-        if self.botEtape == 0:
-            movements += self.neutral_strategy()
+
+       # Busqueda de la factoria con mas puntuacion
         for fact in self.neutralfactories + self.enemyfactories:
             fact_point = self.factory_puntuation(fact)
             if points is None or points < fact_point:
                 points = fact_point
                 factory = fact
+
         #Se comprueba si hay una factoria enemiga objetivo, sino la hay se ha ganado
         if factory is None:
             print("WAIT")
             return 0
+
         #Estrategia de mejora de la produccion
         movements += self.inc_strategy()
 
@@ -274,19 +238,20 @@ class Bot:
 
         # Si la factoria mas cercana no tienen recursos suficientes se procede a ayudar a las factorias aliadas
         if attacker is None:
-            prnt("aqui")
             movements += self.help_factories_strategy()
             print(';'.join(movements) if movements != [] else "WAIT")
             return 0
+        # En caso contrario se crea una tropa cuyo target es factoria con mas puntuacion
         movements += ["MOVE " + str(attacker.entityId) + " " + str(factory.entityId) + " " + str(factory.numCyborgs + 1)]
+
+        # Se aplica la estrategia de utilizar bombas si es necesario
         enemysTargetBomb = self.bomb_strategy()
         if enemysTargetBomb != []:
             prnt(enemysTargetBomb)
             for enemyTargetBomb in enemysTargetBomb:
                 movements += ["BOMB " + str(attacker.entityId) + " " +str(enemyTargetBomb.entityId)]
-                self.bombs -= 1
         print(";".join(movements) if movements != [] else "WAIT")
-
+        return 0
 
     def movement_puntuation(self, movement):
         movs = movement.split(" ")
@@ -298,9 +263,9 @@ class Bot:
                     numCyborgs += max(fact.calculate_n(self), self.t) * fact.production
                 else:
                     try:
-                        dist = distances[int(movs[2])][int(movs[1])]
+                        dist = self.distances[int(movs[2])][int(movs[1])]
                     except KeyError:
-                        dist = distances[int(movs[1])][int(movs[2])]
+                        dist = self.distances[int(movs[1])][int(movs[2])]
                     numCyborgs += (max(fact.calculate_n(self), self.t) - dist) * fact.production
         elif movs[0] == "WAIT":
             numCyborgs = sum([fact.numCyborgs for fact in self.myfactories])
@@ -308,17 +273,24 @@ class Bot:
                 numCyborgs += max(fact.calculate_n(self), self.t) * fact.production
         return numCyborgs
 
+# funcion que realiza prints sobre la salida stderr ya que la salida estandar esta ocupada
+def prnt(toprint):
+    print(toprint, file=sys.stderr, flush=True)
 
-# Carga de la infomacion inicial
-factory_count = int(input())  # the number of factories
-link_count = int(input())  # the number of links between factories
-distances = {}
-maxd = 0
-for i in range(link_count):
-    factory_1, factory_2, distance = [int(j) for j in input().split()]
-    distances.setdefault(factory_1, {factory_2: distance})
-    distances[factory_1][factory_2] = distance
-    if distance > maxd:
-        maxd = distance
-Bot(factory_count, distances, maxd).run()
+def main():
+    # Carga de la infomacion inicial
+    factory_count = int(input())  # the number of factories
+    link_count = int(input())  # the number of links between factories
+    distances = {}
+    maxd = 0
+    for i in range(link_count):
+        factory_1, factory_2, distance = [int(j) for j in input().split()]
+        distances.setdefault(factory_1, {factory_2: distance})
+        distances[factory_1][factory_2] = distance
+        if distance > maxd:
+            maxd = distance
+    Bot(factory_count, distances, maxd).run()
 
+
+if __name__ == "__main__":
+    main()
