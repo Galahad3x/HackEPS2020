@@ -39,10 +39,8 @@ class Factory:
         inferior = math.log(math.e, 100 - self.danger_factor(bot))
         prnt(inferior)
         return int(round((superior / inferior) / 100))
-'''
-    
-    Clase Troop encargada de representar las tropas del juego
-    
+'''  
+    Clase Troop encargada de representar las tropas del juego 
 '''
 class Troop:
     def __init__(self, entityId, entityType, owner, leaving, target, numCyborgs, remainingTurns):
@@ -54,9 +52,7 @@ class Troop:
         self.numCyborgs = numCyborgs
         self.remainingTurns = remainingTurns
 ''' 
-
-    Clase encargada de decidir las las accciones a realizar en el juego
-    
+    Clase encargada de decidir las las accciones a realizar en el juego   
 '''
 class Bot:
     def __init__(self, factoryCount, distances, max_dist):
@@ -108,27 +104,16 @@ class Bot:
         return self.pond[0] + self.pond[1] * self.max_dist + self.pond[2] * 3 + self.pond[4]
 
     # Calcula la puntuacion la factoria en funcion de la ponderación
-    def factory_puntuation(self, factory, ally=True):
+    def factory_puntuation(self, factory):
         # De cara el bot
-        if ally:
-            ally_dist = factory.nearest_distance(self.distances, self.myfactories)
-            enemy_dist = factory.nearest_distance(self.distances, self.enemyfactories)
-            prod = factory.production
-            if factory.numCyborgs != 0:
-                cybs = self.pond[3] / factory.numCyborgs
-            else:
-                cybs = 0
-            owner = -factory.owner
+        ally_dist = factory.nearest_distance(self.distances, self.myfactories)
+        enemy_dist = factory.nearest_distance(self.distances, self.enemyfactories)
+        prod = factory.production
+        if factory.numCyborgs != 0:
+            cybs = self.pond[3] / factory.numCyborgs
         else:
-            # Puntuacion de la factoria desde el punto de vista del enemigo
-            ally_dist = factory.nearest_distance(self.distances, self.enemyfactories)
-            enemy_dist = factory.nearest_distance(self.distances, self.myfactories)
-            prod = factory.production
-            if factory.numCyborgs != 0:
-                cybs = self.pond[3] / factory.numCyborgs
-            else:
-                cybs = 0
-            owner = factory.owner
+            cybs = 0
+        owner = -factory.owner
         #
         if ally_dist is None or enemy_dist is None:
             return 0
@@ -169,7 +154,7 @@ class Bot:
         if self.bombs <= 0:
             return []
         for enemyFactory in self.enemyfactories:
-            if enemyFactory.numCyborgs > 10:
+            if enemyFactory.numCyborgs > 5:
                 enemyTargetBomb.append(enemyFactory)
                 self.bombs -= 1
         return enemyTargetBomb
@@ -256,27 +241,6 @@ class Bot:
         print(";".join(movements) if movements != [] else "WAIT")
         return 0
 
-    # Puntuar un movimiento segun los ciborgs aproximados que tendremos dentro de t turnos
-    def movement_puntuation(self, movement):
-        movs = movement.split(" ")
-        if movs[0] == "MOVE":
-            suma_numCyborgs = sum([fact.numCyborgs for fact in self.myfactories])
-            numCyborgs = suma_numCyborgs - self.factories[int(movs[2])].numCyborgs
-            for fact in self.myfactories:
-                if fact.entityId != int(movs[2]):
-                    numCyborgs += max(fact.calculate_n(self), self.t) * fact.production
-                else:
-                    try:
-                        dist = self.distances[int(movs[2])][int(movs[1])]
-                    except KeyError:
-                        dist = self.distances[int(movs[1])][int(movs[2])]
-                    numCyborgs += (max(fact.calculate_n(self), self.t) - dist) * fact.production
-        elif movs[0] == "WAIT":
-            numCyborgs = sum([fact.numCyborgs for fact in self.myfactories])
-            for fact in self.myfactories:
-                numCyborgs += max(fact.calculate_n(self), self.t) * fact.production
-        return numCyborgs
-
 # funcion que realiza prints sobre la salida stderr ya que la salida estandar esta ocupada
 def prnt(toprint):
     print(toprint, file=sys.stderr, flush=True)
@@ -294,7 +258,6 @@ def main():
         if distance > maxd:
             maxd = distance
     Bot(factory_count, distances, maxd).run()
-
 
 if __name__ == "__main__":
     main()
